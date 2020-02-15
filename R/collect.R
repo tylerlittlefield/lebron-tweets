@@ -25,7 +25,8 @@ df_new_tweets %>%
   bind_rows(df_old_tweets) %>% 
   s3saveRDS(
     object = "lebron_tweets.rds", 
-    bucket = "tylerlittlefield"
+    bucket = "tylerlittlefield",
+    multipart = TRUE
   )
 
 # cronR::cron_add(
