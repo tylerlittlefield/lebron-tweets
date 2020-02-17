@@ -21,17 +21,33 @@ interested in setting up a job to collect data. I think of it as a kind
 of template that I may come back to if there is any twitter data I’d
 like to routinely collect.
 
-    #> # A tibble: 59,091 x 2
-    #>    created_at          text                                                     
-    #>    <dttm>              <chr>                                                    
-    #>  1 2020-02-15 01:27:51 "@NBALAKERSBLOG Creo que todo LA quiere verlo con Lebron…
-    #>  2 2020-02-15 01:27:01 "LeBron James Gazes At His Wife Of 6 Years Savannah Afte…
-    #>  3 2020-02-15 01:26:54 "Need replies\n\nPG- Magic Johnson\nBU- Steph Curry\n\nS…
-    #>  4 2020-02-15 01:26:50 "Jordan forces Lebron left and then people realize....\n…
-    #>  5 2020-02-14 21:37:43 "@taylor_snarr Wow the gap from Harden and Giannis to Le…
-    #>  6 2020-02-15 01:26:38 "Si acierto al menos 4 de 6 predicciones, pongo de perfi…
-    #>  7 2020-02-15 01:26:36 "@HammyBrecks @ShoBusyLivin @ShannonSharpe What about al…
-    #>  8 2020-02-15 01:26:36 "@ybukele Esperamos la foto con LeBron o Giannis"        
-    #>  9 2020-02-15 01:26:34 "@Fast_BreakNBA Uma Jersey do Lebron no cavs, uma camisa…
-    #> 10 2020-02-15 01:26:27 "@jrichardgoodman Closest thing Lebron vs kd?????"       
-    #> # … with 59,081 more rows
+``` r
+library(dplyr)
+library(aws.s3)
+library(stringr)
+library(tidyr)
+library(emo)
+
+df <- s3readRDS("lebron_tweets.rds", "tylerlittlefield")
+
+df %>% 
+  distinct(text) %>% 
+  mutate(emojis = ji_extract_all(text)) %>% 
+  unnest_longer(emojis) %>% 
+  drop_na(emojis) %>% 
+  count(emojis, sort = TRUE)
+#> # A tibble: 776 x 2
+#>    emojis     n
+#>    <chr>  <int>
+#>  1 😂      5445
+#>  2 🤣      1543
+#>  3 🔥      1118
+#>  4 😭      1110
+#>  5 🏀       813
+#>  6 👍       464
+#>  7 🤔       446
+#>  8 👑       441
+#>  9 🐐       397
+#> 10 👀       377
+#> # … with 766 more rows
+```

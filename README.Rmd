@@ -25,19 +25,20 @@ This repository collects twitter data and stores it to my own personal s3 bucket
 
 I have no real use case for this at the moment. I am more or less just interested in setting up a job to collect data. I think of it as a kind of template that I may come back to if there is any twitter data I'd like to routinely collect.
 
-```{r, example, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, example, warning=FALSE, message=FALSE}
 library(dplyr)
 library(aws.s3)
+library(stringr)
+library(tidyr)
+library(emo)
 
-df <- s3readRDS(
-  object = "lebron_tweets.rds",
-  bucket = "tylerlittlefield"
-)
+df <- s3readRDS("lebron_tweets.rds", "tylerlittlefield")
 
 df %>% 
-  distinct(
-    created_at,
-    text
-  )
+  distinct(text) %>% 
+  mutate(emojis = ji_extract_all(text)) %>% 
+  unnest_longer(emojis) %>% 
+  drop_na(emojis) %>% 
+  count(emojis, sort = TRUE)
 ```
 
